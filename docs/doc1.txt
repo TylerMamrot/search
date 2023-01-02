@@ -1,0 +1,28 @@
+As the world continues to navigate the COVID-19 pandemic,
+ the role of the internet in our daily lives has grown exponentially.
+  While many trends have come to light, one that stands out is the need
+  for faster internet speeds in regions that have seen an influx of new residents.
+   According to Pew Research Center, 4.9 million Americans left cities for suburbs
+   or rural areas in 2020. Those who are moving from cities into more remote regions
+    have become accustomed to high-speed connectivity and expect a similar internet
+    experience in their new homes. America’s digital gapRural areas across the country
+     continue to face challenges when it comes to high-speed internet. According to the
+      FCC, nearly 15 million people in rural America do not have access to high-speed internet.
+       Terrestrial-based ISPs are unwilling or unable to serve these communities due to infrastructure
+        limitations. Consumers in these regions therefore depend on satellite internet for
+        staying in touch with friends and family, work, ecommerce, medical appointments, education
+         and more. Additionally, as some companies adopt a remote work policy, more and more employees are exploring
+         moving their families into areas where cable and fiber are unavailable. Consumers in these rural areas need
+         faster internet to support their daily digita
+         l activities.Internet from space connects rural AmericaThe satellite industry has made tremendous progress in terms of its ability to deliver faster internet speeds to unserved or underserved areas.
+         For example, the introduction of tools that allow consumers to manage
+         their satellite internet plans’ data consumption is a helpful way to optimize internet speeds. One of the ways this is done is to give the consumer the ability to control the quality
+          of their streaming experience to use more or less data. By streaming lower- resolution content, consumers are able to better
+         manage their monthly data allowance, which is delivered at a particular speed, depending on the type of plan they have selected.More and more consumers in rural areas are taking advantage of
+         internet services from satellite internet providers today. People using satellite internet today include small-town residents, network engineers and
+         small-business owners, to name a few.The future of the internet in rural AmericaDriven by innovation, satellite internet has the capability to connect more people across remote parts of the country,
+         empowering consumers to live where they want and still be able to
+         benefit from connectivity.Companies such as Viasat are developing new satellites, such as
+         its ViaSat-3 constellation, that will provide satellite internet plans with more data, higher data thresholds, faster speeds, higher-quality streaming and enhanced service
+         reliability.The digital gap is closing, but there’s still work to be done. For more information on how Viasat’s satellite internet is helping close America’s digital gap, click here.
+
