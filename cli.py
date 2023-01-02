@@ -39,11 +39,17 @@ def find(query):
 
 
 @click.command()
-def update():
+@click.argument("file")
+def update(file):
     """
     Index ad hoc docs
     """
-    pass
+    click.echo(file)
+    engine = from_file()
+    engine.add_document(file)
+    engine.index_documents()
+    to_file(engine)
+
 
 
 @click.command()
@@ -54,11 +60,30 @@ def tune():
     pass
 
 
+@click.command()
+@click.option("--files", default=False, type=bool)
+@click.option("--tokens", default=False, type=bool)
+@click.option("--kgrams", default=False, type=bool)
+def info(files, tokens, kgrams):
+    """
+    Info about the search engine
+    """
+    engine = from_file()
+    if files:
+        name = engine.get_document_names()
+        for k,v in name.items():
+            click.echo(f"{k}:{v}")
+
+    if tokens:
+        click.echo(engine.print())
+
+    if kgrams:
+        click.echo(engine._get_kgrams())
+
+
 def get_file_paths(root, files):
     for dirpath, subdirs, child_files in os.walk(root):
         for f in child_files:
-            if f.endswith(".txt"):
-                print(f)
                 files.append(os.path.join(dirpath, f))
         for s in subdirs:
             print(s)
@@ -86,11 +111,19 @@ def create_search_directory():
         pathlib.Path.mkdir(SEARCH_HOME_PATH)
 
 def create_searcher(file_paths):
-    docs = {f: open(f, 'r').read() for f in file_paths}
+    docs = {}
+    for file in file_paths:
+        try:
+            f = open(file, 'r').read()
+            docs[file] = f
+        except UnicodeDecodeError:
+            click.echo(f"WARNING: will not index binary file: {file}")
     return Search.factory(docs)
 
 cli.add_command(init)
 cli.add_command(find)
+cli.add_command(update)
+cli.add_command(info)
 
 
 

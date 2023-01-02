@@ -29,19 +29,19 @@ class Search:
     def _get_kgrams(self):
         _ = [print(f"{k}: {len(v)}: {v}") for k, v in self.k_gram_index.items()]
 
-    def add_document(self, document: str, name: str = None):
+    def add_document(self, document: str, name:str):
         """
-        assign index to a document and apply preprocessing
+        assign index to a document and apply preprocessing, does not reindex engine
 
         In reality, document would probably be written to disk somewhere
         """
+        print(document)
         self.doc_number += 1
         tokens = self.tokenizer.tokenize(document)
         filtered_words = [t for t in tokens if t not in stopwords.words('english')]
         stemmed_words = [self.stemmer.stem(w) for w in filtered_words]
         self.docs[self.doc_number] = stemmed_words
-        if name:
-            self.doc_names[self.doc_number] = name
+        self.doc_names[self.doc_number] = name
 
     def index_documents(self):
         """
@@ -107,15 +107,16 @@ class Search:
             grams = bigrams(stemmed_token)
             for gram in grams:
                 tokens = self.get_kgram(gram)
-                for t in tokens:
-                    stemmed_token = self.stemmer.stem(t)
-                    listing = self.get(stemmed_token)
-                    token_listings = []
-                    if listing:
-                        for l in listing:
-                            doc = self.doc_names[l]
-                            token_listings.append(doc)
-                            listings.append(f"{t}: {token_listings}")
+                if tokens:
+                    for t in tokens:
+                        stemmed_token = self.stemmer.stem(t)
+                        listing = self.get(stemmed_token)
+                        token_listings = []
+                        if listing:
+                            for l in listing:
+                                doc = self.doc_names[l]
+                                token_listings.append(doc)
+                                listings.append(f"{t}: {token_listings}")
 
 
 
