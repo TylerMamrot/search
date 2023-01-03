@@ -1,9 +1,13 @@
+import sys
+
 import os
 import pathlib
 import pickle
 
 import click
 from search import Search
+
+from typing import Dict, List, Set
 
 SEARCH_DIR = ".search"
 
@@ -18,44 +22,51 @@ def cli():
 @click.command()
 def init():
     """
-    Initalize cli
+    Initalize cli, create search engine object and save it to a file.
     """
     root = input("File or directory path to start indexing: ")
     click.echo(f"Indexing your documents at {root}")
-    files = []
-    files = get_file_paths(root, files)
-    engine = create_searcher(files)
+
+    files = get_file_paths(root)
+    engine = create_engine(files)
+
     click.echo("saving engine...")
     to_file(engine)
+
     click.echo("engine saved!")
 
 
 @click.command()
 @click.argument("query")
 def find(query):
+    """
+    find word in indexed docs, or similar words if query cannot be satisfied
+    """
     engine = from_file()
     results = engine.search(query)
     _ = [click.echo(r) for r in results]
 
 
 @click.command()
-@click.argument("file")
-def update(file):
+@click.argument("path", help="Path to file or directory to index")
+def update(path):
     """
-    Index ad hoc docs
+    Index ad hoc documents
     """
-    click.echo(file)
+    click.echo(f"Indexing at {path}")
     engine = from_file()
-    corpus = read_document(file)
-    if corpus:
-        engine.add_document(corpus, file)
-        engine.index_documents()
-        to_file(engine)
-    else:
-        click.echo(f"WARNING {file} is empty not indexing")
 
+    files: List[pathlib.Path] = get_file_paths(path)
 
+    for f in files:
+        corpus = read_file(f)
+        if corpus:
+            engine.add_document(corpus, str(f))
+        else:
+            click.echo(f"WARNING {f} is empty not indexing")
 
+    engine.index_documents()
+    to_file(engine)
 
 
 @click.command()
@@ -77,7 +88,7 @@ def info(files, tokens, kgrams):
     engine = from_file()
     if files:
         name = engine.get_document_names()
-        for k,v in name.items():
+        for k, v in name.items():
             click.echo(f"{k}:{v}")
 
     if tokens:
@@ -87,59 +98,102 @@ def info(files, tokens, kgrams):
         click.echo(engine._get_kgrams())
 
 
-def get_file_paths(root, files):
-    for dirpath, subdirs, child_files in os.walk(root):
-        for f in child_files:
-                files.append(os.path.join(dirpath, f))
-        for s in subdirs:
-            print(s)
-            get_file_paths(s, files)
+def get_file_paths(path):
+    """
+    Get files at the path, will walk direcory structure or read a plain ole file.
+    """
+    files = []
+
+    path = pathlib.Path(path)
+
+    if not pathlib.Path.exists(path):
+        click.echo(f"WARNING: {path} does not exist")
+        return sys.exit(1)
+
+    if pathlib.Path(path).is_dir():
+        click.echo(f"Walking dir {path}")
+        for dirpath, subdirs, child_files in os.walk(path):
+            for f in child_files:
+                files.append(pathlib.Path(dirpath, f))
+            for s in subdirs:
+                files += get_file_paths(pathlib.Path(dirpath, s))
+
+    if pathlib.Path(path).is_file():
+        files.append(path)
 
     return files
+
 
 def to_file(engine):
     """
     serialize search engine object to a file
     """
     create_search_directory()
-    with open(pathlib.Path(SEARCH_HOME_PATH,'search.pickle'), 'wb') as file:
+    with open(pathlib.Path(SEARCH_HOME_PATH, 'search.pickle'), 'wb') as file:
         pickle.dump(engine, file)
+
 
 def from_file():
     """
     load the engine from a file
     """
-    with open(pathlib.Path(SEARCH_HOME_PATH,'search.pickle'), 'rb') as file:
-       return pickle.load(file)
+    with open(pathlib.Path(SEARCH_HOME_PATH, 'search.pickle'), 'rb') as file:
+        return pickle.load(file)
+
 
 def create_search_directory():
+    """
+    create directory to store serialized search engine file
+    """
     if not pathlib.Path.exists(SEARCH_HOME_PATH):
         pathlib.Path.mkdir(SEARCH_HOME_PATH)
 
-def create_searcher(file_paths):
+
+def create_engine(files):
+    """
+    create Search object using file paths.
+    """
+    docs: Dict = collect_files(files)
+    if not docs:
+        click.echo(
+            "WARNING: No documents were read, nothing for engine to index.")
+        sys.exit(1)
+    else:
+        return Search.factory(docs)
+
+
+def collect_files(files) -> Dict[str:str]:
+    """
+    collect files into dict.
+    preprocessing step to feed into Search class
+    """
     docs = {}
-    for file in file_paths:
-        corpus = read_document(file)
+    for file in files:
+        corpus = read_file(file)
         if corpus:
             docs[file] = corpus
         else:
             click.echo(f"WARNING {file} is empty not indexing")
-    return Search.factory(docs)
+    return docs
 
-def read_document(file):
+
+def read_file(file):
+    """
+    read file into string
+    """
     path = pathlib.Path(file)
-    click.echo(path)
     try:
         f = open(path, 'r').read()
         return f
     except UnicodeDecodeError:
-            click.echo(f"WARNING: will not index binary file: {path}")
+        click.echo(f"WARNING: will not index binary file: {path}")
 
+
+# register commands with cli
 cli.add_command(init)
 cli.add_command(find)
 cli.add_command(update)
 cli.add_command(info)
-
 
 
 if __name__ == "__main__":
