@@ -48,10 +48,11 @@ def find(query):
 
 
 @click.command()
-@click.argument("path", help="Path to file or directory to index")
+@click.argument("path")
 def update(path):
     """
     Index ad hoc documents
+    PATH: path to begin indexing, can be a file or directory
     """
     click.echo(f"Indexing at {path}")
     engine = from_file()
@@ -114,7 +115,7 @@ def get_file_paths(path):
         click.echo(f"Walking dir {path}")
         for dirpath, subdirs, child_files in os.walk(path):
             for f in child_files:
-                files.append(pathlib.Path(dirpath, f))
+                files.append(str(pathlib.Path(dirpath, f)))
             for s in subdirs:
                 files += get_file_paths(pathlib.Path(dirpath, s))
 
@@ -162,7 +163,7 @@ def create_engine(files):
         return Search.factory(docs)
 
 
-def collect_files(files) -> Dict[str:str]:
+def collect_files(files):
     """
     collect files into dict.
     preprocessing step to feed into Search class
