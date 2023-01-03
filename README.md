@@ -12,7 +12,7 @@ search.py is exposed through a user friendly cli
 
 To use the search engine you need to do the following.
 
-1.) index the documents you want to search: `search index <doc1, doc2, doc3>
+1.) index the documents you want to search, get started with `search init` then add more files using `search update`
 2.) create a query using the cli, here are some examples:
 * `search find digital`
 * `search find di`
