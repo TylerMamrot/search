@@ -46,9 +46,15 @@ def update(file):
     """
     click.echo(file)
     engine = from_file()
-    engine.add_document(file)
-    engine.index_documents()
-    to_file(engine)
+    corpus = read_document(file)
+    if corpus:
+        engine.add_document(corpus, file)
+        engine.index_documents()
+        to_file(engine)
+    else:
+        click.echo(f"WARNING {file} is empty not indexing")
+
+
 
 
 
@@ -113,12 +119,19 @@ def create_search_directory():
 def create_searcher(file_paths):
     docs = {}
     for file in file_paths:
-        try:
-            f = open(file, 'r').read()
-            docs[file] = f
-        except UnicodeDecodeError:
-            click.echo(f"WARNING: will not index binary file: {file}")
+        corpus = read_document(file)
+        if corpus:
+            docs[file] = corpus
+        else:
+            click.echo(f"WARNING {file} is empty not indexing")
     return Search.factory(docs)
+
+def read_document(file):
+    try:
+        f = open(file, 'r').read()
+        return f
+    except UnicodeDecodeError:
+            click.echo(f"WARNING: will not index binary file: {file}")
 
 cli.add_command(init)
 cli.add_command(find)
