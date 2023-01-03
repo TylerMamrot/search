@@ -127,11 +127,13 @@ def create_searcher(file_paths):
     return Search.factory(docs)
 
 def read_document(file):
+    path = pathlib.Path(file)
+    click.echo(path)
     try:
-        f = open(file, 'r').read()
+        f = open(path, 'r').read()
         return f
     except UnicodeDecodeError:
-            click.echo(f"WARNING: will not index binary file: {file}")
+            click.echo(f"WARNING: will not index binary file: {path}")
 
 cli.add_command(init)
 cli.add_command(find)
