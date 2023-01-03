@@ -29,15 +29,14 @@ class Search:
     def _get_kgrams(self):
         _ = [print(f"{k}: {len(v)}: {v}") for k, v in self.k_gram_index.items()]
 
-    def add_document(self, document: str, name:str):
+    def add_document(self, corpus: str, name:str):
         """
         assign index to a document and apply preprocessing, does not reindex engine
 
         In reality, document would probably be written to disk somewhere
         """
-        print(document)
         self.doc_number += 1
-        tokens = self.tokenizer.tokenize(document)
+        tokens = self.tokenizer.tokenize(corpus)
         filtered_words = [t for t in tokens if t not in stopwords.words('english')]
         stemmed_words = [self.stemmer.stem(w) for w in filtered_words]
         self.docs[self.doc_number] = stemmed_words
@@ -103,6 +102,7 @@ class Search:
         if match:
             listings =[self.doc_names[l] for l in match]
         else:
+
         # fall back to k gram search if we get no result for the original query
             grams = bigrams(stemmed_token)
             for gram in grams:
@@ -116,7 +116,7 @@ class Search:
                             for l in listing:
                                 doc = self.doc_names[l]
                                 token_listings.append(doc)
-                                listings.append(f"{t}: {token_listings}")
+                            listings.append(f"{t}: {token_listings}")
 
 
 
@@ -128,7 +128,7 @@ class Search:
         index = Search()
 
         for k,v in docs.items():
-            index.add_document(document=v, name=k)
+            index.add_document(corpus=v, name=k)
         index.index_documents()
 
         return index
