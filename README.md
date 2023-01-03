@@ -14,8 +14,8 @@ To use the search engine you need to do the following.
 
 1.) index the documents you want to search: `search index <doc1, doc2, doc3>
 2.) create a query using the cli, here are some examples:
-* search digital
-* search di
+* `search find digital`
+* `search find di`
 
 the search engine will search your indexed files and return the list of documents each term belongs in.
 
